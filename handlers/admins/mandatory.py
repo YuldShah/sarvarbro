@@ -144,14 +144,19 @@ async def confirm(callback: types.CallbackQuery, state: FSMContext) -> None:
 @mad.callback_query(CbDataStartsWith("delete_"))
 async def delete_chat(callback: types.CallbackQuery, state: FSMContext) -> None:
     await state.set_state(dels.confirm)
-    cnt = int(callback.data.split("_")[1])
-    channel = db.fetchone("SELECT * FROM channel WHERE idx=?", (cnt,))
+    cnt = int(callback.data.split("_")[2])
+    ty = callback.data.split("_")[1]
+    if ty == "chat":
+        channel = db.fetchone("SELECT idx, title, link FROM channel WHERE idx=?", (cnt,))
+    else:
+        channel = db.fetchone("SELECT idx, title, link FROM external_links WHERE idx=?", (cnt,))
     if not channel:
         await callback.answer("Channel not found")
         await callback.message.delete()
         return
     await state.update_data(idx=channel[0])
-    await callback.message.answer(f"Are you sure you want to delete the chat?", reply_markup=mandconfirm((channel[2], channel[3])), disable_web_page_preview=True)
+    await state.update_data(type=ty)
+    await callback.message.answer(f"Are you sure you want to delete the chat?", reply_markup=mandconfirm((channel[1], channel[2])), disable_web_page_preview=True)
     await callback.message.delete()
 
 @mad.callback_query(dels.confirm)
@@ -164,7 +169,10 @@ async def confirm_delete(callback: types.CallbackQuery, state: FSMContext) -> No
         return
     data = await state.get_data()
     idx = data.get("idx")
-    db.query("DELETE FROM channel WHERE idx=?", (idx,))
+    if data.get("type") == "chat":
+        db.query("DELETE FROM channel WHERE idx=?", (idx,))
+    else:
+        db.query("DELETE FROM external_links WHERE idx=?", (idx,))
     await callback.answer(f"Successfully deleted")
     await pmands(callback.message, state)
     await callback.message.delete()

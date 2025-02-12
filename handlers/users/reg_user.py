@@ -5,7 +5,7 @@ import json  # added import for JSON handling
 from filters import IsNotRegistered, IsUser
 from loader import db
 from keyboards.inline import mand_chans
-from utils.yau import notsubbed
+from utils.yau import notsubbed, get_external_links
 
 reger = Router()
 
@@ -31,12 +31,12 @@ async def process_command(message: types.Message) -> None:
             await message.answer_animation(animation=msg_data["file_id"], caption=msg_data.get("caption", ""), reply_markup=types.ReplyKeyboardRemove())
     else:
         response = f"👋 Heyy, <b>{message.from_user.first_name}</b>."
-        await message.answer(response)
+        await message.answer(response, reply_markup=types.ReplyKeyboardRemove())
     
     # Check subscription status and send further instructions
     channels = await notsubbed(message.from_user.id)
     if channels:
         response = "\n\n❕ You need to join the following chats to be able to use me."
-        await message.answer(response, reply_markup=mand_chans(channels))
+        await message.answer(response, reply_markup=mand_chans(channels, get_external_links()))
     else:
         await message.answer("🎉 You are now registered!")

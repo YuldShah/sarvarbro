@@ -33,6 +33,7 @@ async def pmands(message: types.Message, state: FSMContext) -> None:
     await message.answer(f"Menu: <b>{dict.mands}</b>", reply_markup=main_key)
     response = "There are no mandatory chats to join right now. You can add from here"
     channels = db.fetchall("SELECT title, link, idx FROM channel")
+    external_links = db.fetchall("SELECT title, link, idx FROM external_links")
     if channels:
         response = "Following are the mandatory chats to join. You can add new or delete existing ones."
-    await message.answer(response, reply_markup=mandchans(channels))
+    await message.answer(response, reply_markup=mandchans(channels, external_links))

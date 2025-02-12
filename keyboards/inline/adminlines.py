@@ -2,13 +2,18 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from data import dict, config
 
 
-def mandchans(channels = []):
+def mandchans(channels = [], externals = []):
     # channels = db.fetchall("SELECT title, link FROM channels")
     btns = []
     for channel in channels:
         btns.append([
                 InlineKeyboardButton(text=channel[0], url=channel[1]),
-                InlineKeyboardButton(text=dict.delete, callback_data=f"delete_{channel[2]}")
+                InlineKeyboardButton(text=dict.delete, callback_data=f"delete_chat_{channel[2]}")
+            ])
+    for link in externals:
+        btns.append([
+                InlineKeyboardButton(text=link[0], url=link[1]),
+                InlineKeyboardButton(text=dict.delete, callback_data=f"delete_link_{link[2]}")
             ])
     btns.append([InlineKeyboardButton(text=dict.add_chat, callback_data="add_chat")])
     return InlineKeyboardMarkup(inline_keyboard=btns)

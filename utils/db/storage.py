@@ -16,6 +16,7 @@ class DatabaseManager(object):
         self.query("CREATE TABLE IF NOT EXISTS channel (idx INTEGER PRIMARY KEY, chid TEXT, title TEXT, link TEXT)")
         self.query("CREATE TABLE IF NOT EXISTS bulk_messages (idx INTEGER PRIMARY KEY, content TEXT, type TEXT, status INTEGER DEFAULT 0, date TEXT DEFAULT CURRENT_TIMESTAMP)")
         # New table to store message settings
+        self.query("CREATE TABLE IF NOT EXISTS external_links (idx INTEGER PRIMARY KEY, title TEXT, link TEXT)")
         self.query("CREATE TABLE IF NOT EXISTS message_settings (key TEXT PRIMARY KEY, content TEXT)")
 
     def query(self, arg, values=None):
